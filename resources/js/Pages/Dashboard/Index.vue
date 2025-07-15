@@ -1,4 +1,5 @@
 <template>
+    <Head title="Dashboard" />
     <AppLayout :breadcrumbs="['Dashboard']">
         <!-- Page Header -->
         <div class="mb-8">
@@ -10,7 +11,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <StatsCard
                 title="Total Products"
-                :value="stats.totalProducts"
+                :value="props.stats.totalProducts"
                 icon="CubeIcon"
                 color="blue"
                 :change="'+12%'"
@@ -18,24 +19,24 @@
             />
             <StatsCard
                 title="Low Stock Items"
-                :value="stats.lowStockItems"
+                :value="props.stats.lowStockItems"
                 icon="ExclamationTriangleIcon"
                 color="yellow"
-                :change="-8%'"
+                :change="'-8%'"
                 changeType="negative"
             />
             <StatsCard
                 title="Total Value"
-                :value="`€${stats.totalValue.toLocaleString()}`"
-                icon="CurrencyEuroIcon"
+                :value="`€${props.stats.totalValue.toLocaleString()}`"
+                icon="CurrencyDollarIcon"
                 color="green"
                 :change="'+5%'"
                 changeType="positive"
             />
             <StatsCard
                 title="Monthly Sales"
-                :value="stats.monthlySales"
-                icon="ChartBarIcon"
+                :value="props.stats.monthlySales"
+                icon="TruckIcon"
                 color="purple"
                 :change="'+15%'"
                 changeType="positive"
@@ -53,7 +54,7 @@
                     </a>
                 </div>
                 <div class="space-y-4">
-                    <div v-for="transaction in recentTransactions" :key="transaction.id" class="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+                    <div v-for="transaction in props.recentTransactions" :key="transaction.id" class="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
                         <div class="flex items-center space-x-3">
                             <div :class="`w-8 h-8 rounded-full flex items-center justify-center ${getTransactionColor(transaction.type)}`">
                                 <component :is="getTransactionIcon(transaction.type)" class="h-4 w-4" />
@@ -78,13 +79,15 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-semibold text-gray-900">Low Stock Alerts</h3>
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                        {{ lowStockProducts.length }} items
+                        {{ props.lowStockProducts.length }} items
                     </span>
                 </div>
                 <div class="space-y-4">
-                    <div v-for="product in lowStockProducts" :key="product.id" class="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+                    <div v-for="product in props.lowStockProducts" :key="product.id" class="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
                         <div class="flex items-center space-x-3">
-                            <img :src="product.image" :alt="product.name" class="w-10 h-10 rounded-lg object-cover" />
+                            <div class="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center">
+                                <span class="text-gray-500 text-xs">IMG</span>
+                            </div>
                             <div>
                                 <p class="text-sm font-medium text-gray-900">{{ product.name }}</p>
                                 <p class="text-xs text-gray-500">SKU: {{ product.sku }}</p>
@@ -136,6 +139,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { Head } from '@inertiajs/vue3'
 import AppLayout from '@/Components/Layout/AppLayout.vue'
 import StatsCard from '@/Components/UI/StatsCard.vue'
 import QuickActionButton from '@/Components/UI/QuickActionButton.vue'
@@ -152,29 +156,6 @@ const props = defineProps({
     recentTransactions: Array,
     lowStockProducts: Array,
 })
-
-// Mock data for demonstration
-const stats = {
-    totalProducts: 1247,
-    lowStockItems: 23,
-    totalValue: 156789,
-    monthlySales: 89,
-}
-
-const recentTransactions = [
-    { id: 1, product_name: 'Wireless Headphones', type: 'sale', quantity: -2, amount: '159.98', date: '2025-01-15' },
-    { id: 2, product_name: 'Office Chair', type: 'purchase', quantity: 10, amount: '1299.90', date: '2025-01-15' },
-    { id: 3, product_name: 'Laptop Stand', type: 'sale', quantity: -1, amount: '45.99', date: '2025-01-14' },
-    { id: 4, product_name: 'Desk Lamp', type: 'adjustment', quantity: -1, amount: '0.00', date: '2025-01-14' },
-    { id: 5, product_name: 'Notebook Set', type: 'purchase', quantity: 50, amount: '299.50', date: '2025-01-13' },
-]
-
-const lowStockProducts = [
-    { id: 1, name: 'Wireless Mouse', sku: 'WM-001', current_stock: 3, minimum_stock: 10, image: '/images/products/mouse.jpg' },
-    { id: 2, name: 'USB Cable', sku: 'UC-002', current_stock: 5, minimum_stock: 20, image: '/images/products/cable.jpg' },
-    { id: 3, name: 'Phone Case', sku: 'PC-003', current_stock: 2, minimum_stock: 15, image: '/images/products/case.jpg' },
-    { id: 4, name: 'Screen Protector', sku: 'SP-004', current_stock: 1, minimum_stock: 25, image: '/images/products/protector.jpg' },
-]
 
 const getTransactionColor = (type) => {
     const colors = {
