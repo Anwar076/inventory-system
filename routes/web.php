@@ -2,33 +2,40 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Dashboard\ProductController;
+use App\Http\Controllers\Dashboard\CategoryController;
+use App\Http\Controllers\Dashboard\SupplierController;
+use App\Http\Controllers\Dashboard\StockTransactionController;
+use App\Http\Controllers\Dashboard\ReportController;
+use App\Http\Controllers\Dashboard\SettingsController;
+use App\Http\Controllers\Dashboard\UserController;
+use App\Http\Controllers\Dashboard\BillingController;
+use App\Http\Controllers\Auth\CompanyRegistrationController;
+
+// Central (non-tenant) routes
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return inertia('Dashboard/Index', [
-        'stats' => [
-            'totalProducts' => 1247,
-            'lowStockItems' => 23,
-            'totalValue' => 156789,
-            'monthlySales' => 89,
-        ],
-        'recentTransactions' => [
-            ['id' => 1, 'product_name' => 'Wireless Headphones', 'type' => 'sale', 'quantity' => -2, 'amount' => '159.98', 'date' => '2025-01-15'],
-            ['id' => 2, 'product_name' => 'Office Chair', 'type' => 'purchase', 'quantity' => 10, 'amount' => '1299.90', 'date' => '2025-01-15'],
-            ['id' => 3, 'product_name' => 'Laptop Stand', 'type' => 'sale', 'quantity' => -1, 'amount' => '45.99', 'date' => '2025-01-14'],
-            ['id' => 4, 'product_name' => 'Desk Lamp', 'type' => 'adjustment', 'quantity' => -1, 'amount' => '0.00', 'date' => '2025-01-14'],
-            ['id' => 5, 'product_name' => 'Notebook Set', 'type' => 'purchase', 'quantity' => 50, 'amount' => '299.50', 'date' => '2025-01-13'],
-        ],
-        'lowStockProducts' => [
-            ['id' => 1, 'name' => 'Wireless Mouse', 'sku' => 'WM-001', 'current_stock' => 3, 'minimum_stock' => 10, 'image' => '/images/products/mouse.jpg'],
-            ['id' => 2, 'name' => 'USB Cable', 'sku' => 'UC-002', 'current_stock' => 5, 'minimum_stock' => 20, 'image' => '/images/products/cable.jpg'],
-            ['id' => 3, 'name' => 'Phone Case', 'sku' => 'PC-003', 'current_stock' => 2, 'minimum_stock' => 15, 'image' => '/images/products/case.jpg'],
-            ['id' => 4, 'name' => 'Screen Protector', 'sku' => 'SP-004', 'current_stock' => 1, 'minimum_stock' => 25, 'image' => '/images/products/protector.jpg'],
-        ]
-    ]);
-})->name('dashboard');
+require __DIR__.'/auth.php';
+
+// Redirect default registration to company registration
+Route::get('/register', [\App\Http\Controllers\Auth\CompanyRegistrationController::class, 'create'])->name('register');
+Route::post('/register', [\App\Http\Controllers\Auth\CompanyRegistrationController::class, 'store']);
+
+// Tenant routes (single domain, path-based)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::resource('products', ProductController::class);
+    Route::resource('categories', CategoryController::class);
+    Route::resource('suppliers', SupplierController::class);
+    Route::resource('stock-transactions', StockTransactionController::class);
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports');
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+    Route::resource('users', UserController::class);
+    Route::get('/billing', [BillingController::class, 'index'])->name('billing');
+});
 
 // Product routes
 Route::get('/products', function () {
@@ -70,4 +77,8 @@ Route::get('/reports', function () {
     return response()->json(['message' => 'Reports page - coming soon!']);
 })->name('reports.index');
 
-// require __DIR__.'/auth.php';
+// Debug route to test tenant finder
+Route::get('/test-finder/{slug}', function ($slug) {
+    $tenant = app(App\Tenancy\FindTenantBySlug::class)->find($slug);
+    dd($tenant);
+});

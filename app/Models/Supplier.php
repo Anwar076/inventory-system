@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\ActivityLog\Traits\LogsActivity;
-use Spatie\ActivityLog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Supplier extends Model
 {
@@ -15,7 +15,6 @@ class Supplier extends Model
 
     protected $fillable = [
         'name',
-        'company_name',
         'email',
         'phone',
         'mobile',

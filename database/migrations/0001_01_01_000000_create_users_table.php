@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('tenant_id')->nullable()->index();
             $table->string('name');
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
@@ -29,7 +28,6 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
 
-            $table->index(['tenant_id', 'email']);
             $table->index('is_active');
         });
 

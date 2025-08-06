@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Spatie\ActivityLog\Traits\LogsActivity;
-use Spatie\ActivityLog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Product extends Model implements HasMedia
 {
@@ -74,6 +74,23 @@ class Product extends Model implements HasMedia
     public function stockTransactions(): HasMany
     {
         return $this->hasMany(StockTransaction::class);
+    }
+
+    public function productStocks()
+    {
+        return $this->hasMany(ProductStock::class);
+    }
+
+    // Totale voorraad over alle locaties
+    public function getTotalStockAttribute()
+    {
+        return $this->productStocks()->sum('current_stock');
+    }
+
+    // Voorraad per locatie ophalen
+    public function stockForLocation($pandId)
+    {
+        return $this->productStocks()->where('pand_id', $pandId)->first();
     }
 
     public function registerMediaCollections(): void

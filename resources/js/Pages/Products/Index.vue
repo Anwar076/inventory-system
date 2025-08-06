@@ -12,7 +12,6 @@
                     Add Product
                 </a>
             </div>
-            
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -26,28 +25,23 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="product in products" :key="product.id">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ product.name }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ product.sku }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                €{{ product.price }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ product.stock }}
-                            </td>
+                        <tr v-for="product in products.data" :key="product.id">
+                            <td class="px-6 py-4 whitespace-nowrap">{{ product.name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ product.sku }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">€{{ product.selling_price }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ product.current_stock }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span :class="product.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
-                                    {{ product.status }}
+                                <span :class="product.is_active ? 'text-green-600' : 'text-red-600'">
+                                    {{ product.is_active ? 'Active' : 'Inactive' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <button class="text-blue-600 hover:text-blue-900 mr-2">Edit</button>
-                                <button class="text-red-600 hover:text-red-900">Delete</button>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <a :href="`/products/${product.id}/edit`" class="text-blue-600 hover:underline mr-2">Edit</a>
+                                <a :href="`/products/${product.id}`" class="text-gray-600 hover:underline">View</a>
                             </td>
+                        </tr>
+                        <tr v-if="products.data.length === 0">
+                            <td colspan="6" class="text-center py-8 text-gray-400">No products found.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -57,9 +51,10 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import AppLayout from '@/Components/Layout/AppLayout.vue'
 
 const props = defineProps({
-    products: Array,
+    products: Object,
 })
 </script>

@@ -1,46 +1,21 @@
-# InventoryPro SaaS - Complete Inventory Management System
+# InventoryPro - Single Company Inventory Management System
 
 ## 🚀 Project Overview
 
-A modern, scalable, multi-tenant SaaS inventory management system built with Laravel 12, Vue 3, Inertia.js, and Tailwind CSS 4.0.
+Een modern, schaalbaar voorraadbeheersysteem gebouwd met Laravel 12, Vue 3, Inertia.js en Tailwind CSS 4.0, geschikt voor één bedrijf.
 
-## ✅ Completed Components
+## ✅ Features
+- Productbeheer
+- Categorieën
+- Leveranciers
+- Voorraadtransacties
+- Gebruikersbeheer
+- Rapportages
+- Abonnementen (optioneel)
 
-### 🏗️ Backend Architecture
+## 🔧 Geen multi-tenancy, geen Stancl/Tenancy, alles draait om één centrale database en één bedrijf.
 
-#### Core Models
-- **Company** - Tenant model with Stancl/Tenancy integration
-- **User** - Multi-tenant user management with roles
-- **Product** - Comprehensive product management with media support
-- **Category** - Hierarchical category system
-- **Supplier** - Supplier management with contact details
-- **StockTransaction** - Complete inventory movement tracking
-- **NotificationSetting** - Company-specific alert configuration
-- **CompanySubscription** - Stripe subscription management
-
-#### Database Migrations
-- Companies table with tenancy support
-- Users table with tenant_id relationships
-- Products table with comprehensive inventory fields
-- Categories table with hierarchical structure
-- Suppliers table with business information
-- Stock transactions table for inventory tracking
-- Notification settings table
-- Company subscriptions table for billing
-
-#### Package Integrations
-- **Stancl/Tenancy** - Multi-tenancy with database isolation
-- **Spatie/Laravel-Permission** - Role-based access control
-- **Spatie/Laravel-MediaLibrary** - Product image management
-- **Laravel/Sanctum** - API authentication
-- **Laravel/Cashier** - Stripe payment processing
-- **Laravel/Horizon** - Queue monitoring
-- **Spatie/Laravel-ActivityLog** - Audit trail
-- **Intervention/Image** - Image processing
-- **Maatwebsite/Excel** - Report exports
-- **Barryvdh/Laravel-DomPDF** - PDF generation
-
-### 🎨 Frontend Setup
+## 🎨 Frontend Setup
 
 #### Technologies
 - **Vue 3** - Modern reactive framework
@@ -55,34 +30,6 @@ A modern, scalable, multi-tenant SaaS inventory management system built with Lar
 - Tailwind CSS with custom SaaS-specific styles
 - Vue application entry point configured
 - Package.json with all dependencies
-
-## 🏢 Multi-Tenancy Architecture
-
-### Tenant Isolation
-- **Database per tenant** approach
-- Automatic database creation/deletion
-- Isolated data and media storage
-- Subdomain-based tenant identification
-
-### Subscription Management
-- Three-tier pricing (Starter/Pro/Enterprise)
-- Stripe integration for payments
-- Usage limits and feature restrictions
-- 14-day free trial system
-
-## 🔐 Security Features
-
-### Authentication & Authorization
-- Laravel Sanctum for API security
-- Role-based permissions (Admin/Manager/Staff)
-- Multi-tenant user isolation
-- Session management
-
-### Data Protection
-- Input validation and sanitization
-- CSRF protection
-- Rate limiting
-- Audit logging
 
 ## 📊 Core Features
 

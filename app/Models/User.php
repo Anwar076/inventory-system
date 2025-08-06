@@ -25,7 +25,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'tenant_id',
         'first_name',
         'last_name',
         'phone',
@@ -60,11 +59,6 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
-    }
-
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class, 'tenant_id');
     }
 
     public function getFullNameAttribute(): string
