@@ -221,6 +221,11 @@ class Product extends Model implements HasMedia
             'notes' => $notes,
             'transaction_date' => now(),
         ]);
+
+        // Check if still low stock after adding
+        if ($this->current_stock <= $this->minimum_stock && $this->minimum_stock > 0) {
+            $this->notifyLowStock();
+        }
     }
 
     public function removeStock(int $quantity, string $type = 'sale', ?string $notes = null): void
@@ -236,6 +241,19 @@ class Product extends Model implements HasMedia
             'notes' => $notes,
             'transaction_date' => now(),
         ]);
+
+        // Check if now low stock after removing
+        if ($this->current_stock <= $this->minimum_stock && $this->minimum_stock > 0) {
+            $this->notifyLowStock();
+        }
+    }
+
+    public function notifyLowStock(): void
+    {
+        $users = User::all();
+        foreach ($users as $user) {
+            $user->notify(new \App\Notifications\ProductLowStockNotification($this));
+        }
     }
 
     public function getActivitylogOptions(): LogOptions

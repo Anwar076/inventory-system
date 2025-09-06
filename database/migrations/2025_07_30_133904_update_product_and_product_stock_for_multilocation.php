@@ -14,6 +14,9 @@ return new class extends Migration
         // Verwijder current_stock uit products
         Schema::table('products', function (Blueprint $table) {
             if (Schema::hasColumn('products', 'current_stock')) {
+                // First drop the index that includes current_stock
+                $table->dropIndex(['current_stock', 'minimum_stock']);
+                // Then drop the column
                 $table->dropColumn('current_stock');
             }
         });
@@ -32,6 +35,8 @@ return new class extends Migration
         // Voeg current_stock weer toe aan products
         Schema::table('products', function (Blueprint $table) {
             $table->integer('current_stock')->default(0);
+            // Recreate the index
+            $table->index(['current_stock', 'minimum_stock']);
         });
 
         // Verwijder unieke index uit product_stocks
