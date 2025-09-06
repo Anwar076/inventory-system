@@ -14,18 +14,33 @@ class ProposeLowStockTransaction extends Command
 
     public function handle()
     {
-        $products = Product::whereColumn('current_stock', '<', 'minimum_stock')->get();
-        if ($products->isEmpty()) {
+        // Check products with low stock in main products table
+        $lowStockProducts = Product::whereColumn('current_stock', '<=', 'minimum_stock')
+                                 ->where('minimum_stock', '>', 0)
+                                 ->get();
+
+        if ($lowStockProducts->isEmpty()) {
             $this->info('Geen producten onder minimumvoorraad.');
             return 0;
         }
-        foreach ($products as $product) {
+
+        // Send notifications
+        $users = User::all();
+        foreach ($lowStockProducts as $product) {
+            // Send low stock notification
+            foreach ($users as $user) {
+                $user->notify(new \App\Notifications\ProductLowStockNotification($product));
+            }
+
+            // Send transaction proposal
             $proposalId = (string) Str::uuid();
-            foreach (User::all() as $user) {
+            foreach ($users as $user) {
                 $user->notify(new \App\Notifications\ProposeLowStockTransactionNotification($product, $proposalId));
             }
-            $this->info('Voorstel verstuurd voor product: ' . $product->name);
+            
+            $this->info('Notificaties verstuurd voor product: ' . $product->name);
         }
+        
         return 0;
     }
 }

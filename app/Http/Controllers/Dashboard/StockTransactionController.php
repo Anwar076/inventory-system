@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 use App\Models\StockTransaction;
 use App\Models\Product;
 use App\Models\Supplier;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Notifications\ProductLowStockNotification;
 
 class StockTransactionController extends Controller
 {
@@ -80,6 +82,15 @@ class StockTransactionController extends Controller
             'transaction_date' => $data['transaction_date'],
             'notes' => $data['notes'] ?? null,
         ]);
+
+        // Check if product is now low stock and send notification
+        if ($product->current_stock <= $product->minimum_stock && $product->minimum_stock > 0) {
+            $users = User::all();
+            foreach ($users as $user) {
+                $user->notify(new ProductLowStockNotification($product));
+            }
+        }
+
         return redirect()->route('stock-transactions.index')->with('success', 'Stock transaction added!');
     }
 
