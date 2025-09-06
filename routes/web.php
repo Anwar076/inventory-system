@@ -11,6 +11,8 @@ use App\Http\Controllers\Dashboard\ReportController;
 use App\Http\Controllers\Dashboard\SettingsController;
 use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Dashboard\BillingController;
+use App\Http\Controllers\Dashboard\InventoryController;
+use App\Http\Controllers\Dashboard\LocatieController;
 use App\Http\Controllers\Auth\CompanyRegistrationController;
 
 // Central (non-tenant) routes
@@ -36,37 +38,14 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('users', UserController::class);
     Route::get('/billing', [BillingController::class, 'index'])->name('billing');
 
+    // Inventory routes
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('/inventory/{pand}', [InventoryController::class, 'show'])->name('inventory.show');
+    Route::post('/inventory/{pand}/stock', [InventoryController::class, 'createStock'])->name('inventory.stock.create');
+    Route::put('/inventory/stock/{productStock}', [InventoryController::class, 'updateStock'])->name('inventory.stock.update');
+
     // Locaties (Pands) routes
-    Route::get('/pands', function () {
-        // You should fetch locaties from the database, here is a placeholder
-        $locaties = \App\Models\Locatie::all();
-        return inertia('Locaties/Index', [
-            'locaties' => $locaties,
-        ]);
-    })->name('pands.index');
-
-    Route::get('/pands/create', function () {
-        return inertia('Locaties/Create');
-    })->name('pands.create');
-
-    Route::post('/pands', [\App\Http\Controllers\Dashboard\LocatieController::class, 'store'])->name('pands.store');
-
-    Route::get('/pands/{id}', function ($id) {
-        $locatie = \App\Models\Locatie::findOrFail($id);
-        return inertia('Locaties/Show', [
-            'locatie' => $locatie,
-        ]);
-    })->name('pands.show');
-
-    Route::get('/pands/{id}/edit', function ($id) {
-        $locatie = \App\Models\Locatie::findOrFail($id);
-        return inertia('Locaties/Edit', [
-            'locatie' => $locatie,
-        ]);
-    })->name('pands.edit');
-
-    Route::put('/pands/{id}', [\App\Http\Controllers\Dashboard\LocatieController::class, 'update'])->name('pands.update');
-    Route::delete('/pands/{id}', [\App\Http\Controllers\Dashboard\LocatieController::class, 'destroy'])->name('pands.destroy');
+    Route::resource('pands', LocatieController::class);
 });
 
 // Remove duplicate or conflicting routes for products, categories, suppliers, etc.
