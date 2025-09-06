@@ -97,32 +97,81 @@ class StockTransactionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(StockTransaction $stockTransaction)
     {
-        //
+        $stockTransaction->load(['product', 'supplier', 'user']);
+        return Inertia::render('StockTransactions/Show', [
+            'transaction' => $stockTransaction,
+        ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(StockTransaction $stockTransaction)
     {
-        //
+        $products = Product::orderBy('name')->get();
+        $suppliers = Supplier::orderBy('name')->get();
+        return Inertia::render('StockTransactions/Edit', [
+            'transaction' => $stockTransaction,
+            'products' => $products,
+            'suppliers' => $suppliers,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, StockTransaction $stockTransaction)
     {
-        //
+        $data = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'type' => 'required|string',
+            'quantity' => 'required|integer',
+            'transaction_date' => 'required|date',
+            'supplier_id' => 'nullable|exists:suppliers,id',
+            'notes' => 'nullable|string',
+        ]);
+
+        $product = Product::findOrFail($data['product_id']);
+        
+        // Calculate the difference in quantity
+        $quantityDifference = $data['quantity'] - $stockTransaction->quantity;
+        
+        // Update product stock
+        if ($quantityDifference != 0) {
+            $product->increment('current_stock', $quantityDifference);
+        }
+
+        $stockTransaction->update([
+            'product_id' => $data['product_id'],
+            'supplier_id' => $data['supplier_id'] ?? null,
+            'type' => $data['type'],
+            'quantity' => $data['quantity'],
+            'remaining_stock' => $product->current_stock,
+            'unit_price' => $product->purchase_price,
+            'total_amount' => $data['quantity'] * $product->purchase_price,
+            'transaction_date' => $data['transaction_date'],
+            'notes' => $data['notes'] ?? null,
+        ]);
+
+        return redirect()->route('stock-transactions.index')->with('success', 'Stock transaction updated!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(StockTransaction $stockTransaction)
     {
-        //
+        // Reverse the stock change
+        $product = $stockTransaction->product;
+        if ($stockTransaction->quantity > 0) {
+            $product->decrement('current_stock', $stockTransaction->quantity);
+        } else {
+            $product->increment('current_stock', abs($stockTransaction->quantity));
+        }
+
+        $stockTransaction->delete();
+        return redirect()->route('stock-transactions.index')->with('success', 'Stock transaction deleted!');
     }
 }

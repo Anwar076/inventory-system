@@ -2,29 +2,35 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\MailMessage;
 use App\Models\Pand;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class LocationUpdatedNotification extends Notification
 {
     use Queueable;
-    public $location;
-    public function __construct(Pand $location) { $this->location = $location; }
-    public function via($notifiable) { return ['database']; }
-    public function toMail($notifiable) {
-        return (new MailMessage)
-            ->subject('Locatie aangepast')
-            ->line("De locatie '{$this->location->name}' is aangepast.")
-            ->action('Bekijk locatie', url('/pands/' . $this->location->id));
+
+    protected $location;
+
+    public function __construct(Pand $location)
+    {
+        $this->location = $location;
     }
-    public function toDatabase($notifiable) {
+
+    public function via($notifiable)
+    {
+        return ['database'];
+    }
+
+    public function toDatabase($notifiable)
+    {
         return [
+            'title' => 'Locatie bijgewerkt',
+            'message' => "Locatie '{$this->location->name}' is bijgewerkt.",
             'location_id' => $this->location->id,
             'location_name' => $this->location->name,
-            'message' => "De locatie '{$this->location->name}' is aangepast.",
-            'url' => url('/pands/' . $this->location->id),
         ];
     }
 }

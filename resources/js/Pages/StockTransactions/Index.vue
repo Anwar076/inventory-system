@@ -47,6 +47,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -57,9 +58,13 @@
                             <td class="px-6 py-4 whitespace-nowrap">{{ tx.quantity }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ tx.user_name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ tx.notes }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <a :href="`/stock-transactions/${tx.id}`" class="text-blue-600 hover:underline mr-2">View</a>
+                                <a :href="`/stock-transactions/${tx.id}/edit`" class="text-gray-600 hover:underline">Edit</a>
+                            </td>
                         </tr>
                         <tr v-if="filteredTransactions.length === 0">
-                            <td colspan="6" class="text-center py-8 text-gray-400">No transactions found.</td>
+                            <td colspan="7" class="text-center py-8 text-gray-400">No transactions found.</td>
                         </tr>
                     </tbody>
                 </table>
