@@ -21,8 +21,8 @@ Route::get('/', function () {
 require __DIR__.'/auth.php';
 
 // Redirect default registration to company registration
-Route::get('/register', [\App\Http\Controllers\Auth\CompanyRegistrationController::class, 'create'])->name('register');
-Route::post('/register', [\App\Http\Controllers\Auth\CompanyRegistrationController::class, 'store']);
+Route::get('/register', [CompanyRegistrationController::class, 'create'])->name('register');
+Route::post('/register', [CompanyRegistrationController::class, 'store']);
 
 // Tenant routes (single domain, path-based)
 Route::middleware(['auth'])->group(function () {
@@ -35,50 +35,45 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
     Route::resource('users', UserController::class);
     Route::get('/billing', [BillingController::class, 'index'])->name('billing');
+
+    // Locaties (Pands) routes
+    Route::get('/pands', function () {
+        // You should fetch locaties from the database, here is a placeholder
+        $locaties = \App\Models\Locatie::all();
+        return inertia('Locaties/Index', [
+            'locaties' => $locaties,
+        ]);
+    })->name('pands.index');
+
+    Route::get('/pands/create', function () {
+        return inertia('Locaties/Create');
+    })->name('pands.create');
+
+    Route::post('/pands', [\App\Http\Controllers\Dashboard\LocatieController::class, 'store'])->name('pands.store');
+
+    Route::get('/pands/{id}', function ($id) {
+        $locatie = \App\Models\Locatie::findOrFail($id);
+        return inertia('Locaties/Show', [
+            'locatie' => $locatie,
+        ]);
+    })->name('pands.show');
+
+    Route::get('/pands/{id}/edit', function ($id) {
+        $locatie = \App\Models\Locatie::findOrFail($id);
+        return inertia('Locaties/Edit', [
+            'locatie' => $locatie,
+        ]);
+    })->name('pands.edit');
+
+    Route::put('/pands/{id}', [\App\Http\Controllers\Dashboard\LocatieController::class, 'update'])->name('pands.update');
+    Route::delete('/pands/{id}', [\App\Http\Controllers\Dashboard\LocatieController::class, 'destroy'])->name('pands.destroy');
 });
 
-// Product routes
-Route::get('/products', function () {
-    return inertia('Products/Index', [
-        'products' => [
-            ['id' => 1, 'name' => 'Wireless Headphones', 'sku' => 'WH-001', 'price' => '79.99', 'stock' => 45, 'status' => 'active'],
-            ['id' => 2, 'name' => 'Office Chair', 'sku' => 'OC-002', 'price' => '129.99', 'stock' => 12, 'status' => 'active'],
-            ['id' => 3, 'name' => 'Laptop Stand', 'sku' => 'LS-003', 'price' => '45.99', 'stock' => 8, 'status' => 'active'],
-        ]
-    ]);
-})->name('products.index');
-
-Route::get('/products/create', function () {
-    return inertia('Products/Create');
-})->name('products.create');
-
-// Other routes
-Route::get('/categories', function () {
-    return response()->json(['message' => 'Categories page - coming soon!']);
-})->name('categories.index');
-
-Route::get('/suppliers', function () {
-    return response()->json(['message' => 'Suppliers page - coming soon!']);
-})->name('suppliers.index');
-
-Route::get('/suppliers/create', function () {
-    return response()->json(['message' => 'Add Supplier page - coming soon!']);
-})->name('suppliers.create');
-
-Route::get('/stock-transactions', function () {
-    return response()->json(['message' => 'Stock Transactions page - coming soon!']);
-})->name('stock-transactions.index');
-
-Route::get('/stock-transactions/create', function () {
-    return response()->json(['message' => 'Add Stock page - coming soon!']);
-})->name('stock-transactions.create');
-
-Route::get('/reports', function () {
-    return response()->json(['message' => 'Reports page - coming soon!']);
-})->name('reports.index');
+// Remove duplicate or conflicting routes for products, categories, suppliers, etc.
+// The resource routes above already handle index/create/show/edit/store/update/destroy
 
 // Debug route to test tenant finder
 Route::get('/test-finder/{slug}', function ($slug) {
-    $tenant = app(App\Tenancy\FindTenantBySlug::class)->find($slug);
+    $tenant = app(\App\Tenancy\FindTenantBySlug::class)->find($slug);
     dd($tenant);
 });
